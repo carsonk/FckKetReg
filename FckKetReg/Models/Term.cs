@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FckKetReg.Models
 {
+    /// <summary>
+    /// Model for a term.
+    /// </summary>
     class Term
     {
         private int _year;
@@ -15,21 +18,24 @@ namespace FckKetReg.Models
         public Term(int year, string englishSeasonName)
         {
             _year = year;
-            _season = getSeasonCodeByName(englishSeasonName);
+            _season = GetSeasonCodeByName(englishSeasonName);
             _termCode = _year.ToString() + _season;
         }
 
-        public Term(string termCode)
+        public Term(string seasonSpaceYearString)
         {
-            _termCode = termCode;
+            string[] parts = seasonSpaceYearString.Split(' ');
+            _season = GetSeasonCodeByName(parts[0]);
+            _year = Convert.ToInt32(parts[1]);
+            _termCode = _year.ToString() + _season;
         }
 
-        public string getTermCode()
+        public string GetTermCode()
         {
             return _year.ToString() + _season;
         }
 
-        public static string getSeasonCodeByName(string englishName)
+        public static string GetSeasonCodeByName(string englishName)
         {
             // Since they're throwing returns, they don't need breaks.
             switch (englishName)

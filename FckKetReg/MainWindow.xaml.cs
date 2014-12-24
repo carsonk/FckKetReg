@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FckKetReg.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,14 +27,12 @@ namespace FckKetReg
             InitializeComponent();
         }
 
-        private void checkLogin(object sender, RoutedEventArgs e)
+        private void CheckLogin(object sender, RoutedEventArgs e)
         {
             string inputtedUsername = userID.Text;
             string inputtedPassword = password.Password;
-            output.Text = "Building RM with creds: " + inputtedUsername + " & " + inputtedPassword;
-            output.Text += " \n";
             RequestManager rm = new RequestManager(inputtedUsername, inputtedPassword);
-            rm.Term = term.Text;
+            rm.CurrentTerm = new Term(term.Text);
             rm.RegistrationPIN = regPin.Text;
 
             if (rm.AttemptLogin())
@@ -41,7 +40,7 @@ namespace FckKetReg
                 rm.AccessRegistrationPage();
             }
 
-            output.Text += rm.Output;
+            output.Text = rm.Output;
         }
     }
 }
