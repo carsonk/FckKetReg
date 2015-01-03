@@ -13,5 +13,6 @@ namespace FckKetReg
     /// </summary>
     public partial class App : Application
     {
+        
     }
 }

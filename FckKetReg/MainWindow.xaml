@@ -1,7 +1,8 @@
 ﻿<Window x:Class="FckKetReg.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FckKetReg - Registration Scheduler" Height="474" Width="541">
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="FckKetReg - Registration Scheduler" Height="522" Width="557">
     <Grid Margin="0,0,0,1">
         <Label x:Name="userIDLabel" Content="JWEB User ID" HorizontalAlignment="Left" Height="23" Margin="10,13,0,0" VerticalAlignment="Top" Width="89"/>
         <TextBox x:Name="userID" HorizontalAlignment="Left" Height="23" Margin="104,13,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
@@ -13,21 +14,32 @@
         <Label x:Name="regPinLabel" Content="Reg PIN" HorizontalAlignment="Left" Height="23" Margin="229,13,0,0" VerticalAlignment="Top" Width="89"/>
         <Label x:Name="termLabel" Content="Term" HorizontalAlignment="Left" Height="23" Margin="229,41,0,0" VerticalAlignment="Top" Width="89"/>
 
-        <Separator HorizontalAlignment="Left" Height="23" Margin="0,93,-2,0" VerticalAlignment="Top" Width="535"/>
 
-        <Label Content="CRNs" HorizontalAlignment="Left" Margin="10,113,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="16,140,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" />
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="266,140,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="141,140,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="391,140,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="16,168,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="266,168,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="141,168,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="391,168,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        
+        <GroupBox x:Name="crnGroupBox" Header="CRNs" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top" Height="119" Width="529">
+            <Grid Margin="0,0,-2,-12" Height="109" VerticalAlignment="Top">
+                <TextBox x:Name="crn1" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
+                <TextBox x:Name="crn2" HorizontalAlignment="Left" Height="23" Margin="135,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+                <TextBox x:Name="crn3" HorizontalAlignment="Left" Height="23" Margin="260,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+                <TextBox x:Name="crn4" HorizontalAlignment="Left" Height="23" Margin="385,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="119" RenderTransformOrigin="0.5,0.5"/>
+                <TextBox x:Name="crn5" HorizontalAlignment="Left" Height="23" Margin="10,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
+                <TextBox x:Name="crn6" HorizontalAlignment="Left" Height="23" Margin="135,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+                <TextBox x:Name="crn7" HorizontalAlignment="Left" Height="23" Margin="260,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+                <TextBox x:Name="crn8" HorizontalAlignment="Left" Height="23" Margin="135,66,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+                <TextBox x:Name="crn9" HorizontalAlignment="Left" Height="23" Margin="10,66,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+                <TextBox x:Name="crn10" HorizontalAlignment="Left" Height="23" Margin="385,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox x:Name="schedulingGroupBox" Header="Schede Registration" HorizontalAlignment="Left" Margin="10,223,0,0" VerticalAlignment="Top" Height="75" Width="529">
+            <Grid Height="65" VerticalAlignment="Top" Margin="0,0,-2,-12">
+                <xctk:DateTimePicker x:Name="scheduledTime" Margin="10,13,143,28"  />
+                <Button x:Name="button" Content="Schedule" HorizontalAlignment="Left" Margin="381,13,0,0" VerticalAlignment="Top" Width="87" Height="24" Click="ScheduleRegistration"/>
+            </Grid>
+        </GroupBox>
+
         <TextBlock HorizontalAlignment="Left" Margin="309,48,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
 
-        <ScrollViewer Margin="0,215,0,0" Background="#FFFFCFCF">
+        <ScrollViewer Margin="0,303,0,0" Background="Black" Foreground="White">
             <TextBlock x:Name="output" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="515" />
         </ScrollViewer>
         <TextBox x:Name="regPin" HorizontalAlignment="Left" Height="23" Margin="323,13,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>

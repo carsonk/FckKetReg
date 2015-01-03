@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Controls;
 
 namespace FckKetReg
 {
@@ -11,29 +12,28 @@ namespace FckKetReg
     /// </summary>
     class RegistrationScheduler
     {
-        private RequestManager _requestManager;
+        // TODO: Make this class not suck.
 
-        public RegistrationScheduler(RequestManager requestManager)
+        private TimerCallback _registrationCallback;
+        private TimerCallback _loginCallback;
+
+        private Timer _registrationTimer;
+        private Timer _loginTimer;
+
+        public RegistrationScheduler(TimerCallback registrationCallback, TimerCallback loginCallback)
         {
-            _requestManager = requestManager;
+            _registrationCallback = registrationCallback;
+            _loginCallback = loginCallback;
         }
 
-        public void scheduleRegistration()
+        public void ScheduleRegistration(DateTime registrationFireTime)
         {
-            AutoResetEvent autoEvent = new AutoResetEvent(false);
-
+            
         }
 
-        private bool fireSetup()
+        public void ClearTimers()
         {
-
-            return false;
-        }
-
-        private bool fireRegistration()
-        {
-
-            return false;
+            
         }
     }
 }

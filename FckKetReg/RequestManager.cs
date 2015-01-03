@@ -1,6 +1,8 @@
 ﻿using FckKetReg.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Web;
 
 namespace FckKetReg
 {
@@ -12,9 +14,11 @@ namespace FckKetReg
         private string userID = "";
         private string password = "";
 
-        public string RegistrationPIN { get; set; }
-        public Term CurrentTerm { get; set; }
-       
+        private string _registrationPIN;
+        private Term _currentTerm;
+
+        public Queue<string> CRNs { get; set; } // Class registration numbers.
+
         private CookiedWebClient webClient;
 
         private const string BASE_URL = "https://jweb.kettering.edu/cku1/";
@@ -32,14 +36,15 @@ namespace FckKetReg
                                    "Invalid Alternate PIN."
                                };
 
-        public RequestManager(string userID, string password)
+        public RequestManager(string userID, string password, string registrationPIN, Term registeringForTerm)
         {
             LogToOutput("Preparing request system.");
             webClient = new CookiedWebClient();
             this.userID = userID;
             this.password = password;
-            RegistrationPIN = "";
-            CurrentTerm = new Term("201501");
+            _registrationPIN = registrationPIN;
+            _currentTerm = registeringForTerm;
+            CRNs = new Queue<string>();
         }
 
         /// <summary>
@@ -61,6 +66,7 @@ namespace FckKetReg
             
             byte[] valResponseByteArray = webClient.UploadValues(VAL_URL, creds);
             string valResponse = System.Text.Encoding.Default.GetString(valResponseByteArray);
+            CurrentHTML = valResponse;
 
             bool loginStatus = (valResponse.Contains("url=/cku1/twbkwbis.P_GenMenu"));
             if (!loginStatus) LogToOutput("Login failed. Check credentials or connection.");
@@ -93,7 +99,7 @@ namespace FckKetReg
             if (altPinPageGet.Contains(TERM_PAGE_SAMPLE))
             {
                 LogToOutput("Selecting a term.");
-                NameValueCollection termPost = new NameValueCollection { { "term_in", CurrentTerm.GetTermCode() } };
+                NameValueCollection termPost = new NameValueCollection { { "term_in", _currentTerm.GetTermCode() } };
                 byte[] termResponse = webClient.UploadValues(PIN_URL, termPost);
                 pinPage = System.Text.Encoding.Default.GetString(termResponse);
             }
@@ -125,6 +131,8 @@ namespace FckKetReg
                 return false;
             }
 
+            CurrentHTML = pinPage;
+
             string termError = FindKnownError(pinPage);
             if (termError != null)
             {
@@ -132,7 +140,7 @@ namespace FckKetReg
                 return false;
             }
 
-            if (pinPage.Contains(PIN_PAGE_SAMPLE))
+            if (!pinPage.Contains(PIN_PAGE_SAMPLE))
             {
                 LogToOutput("Did not reach PIN page.");
                 return false;
@@ -140,10 +148,11 @@ namespace FckKetReg
 
             // Tries to pass registration PIN.
             LogToOutput("Passing entered PIN.");
-            NameValueCollection pinPost = new NameValueCollection { { "pin", RegistrationPIN } };
+            NameValueCollection pinPost = new NameValueCollection { { "pin", _registrationPIN } };
             byte[] pinEnteredResponseByteArray = webClient.UploadValues(CHECK_PIN_URL, pinPost);
             string pinEnteredResponse = 
                 System.Text.Encoding.Default.GetString(pinEnteredResponseByteArray);
+            CurrentHTML = pinEnteredResponse;
 
             if (pinEnteredResponse.Contains(REG_PAGE_SAMPLE))
             {
@@ -166,6 +175,42 @@ namespace FckKetReg
 
         public bool AddClasses()
         {
+            return AddClasses(false);
+        }
+
+        /// <summary>
+        /// Registers for classes.
+        /// </summary>
+        /// <param name="triedLogin">Whether or not login has already been tried.</param>
+        /// <returns>True if registration succeeded.</returns>
+        public bool AddClasses(bool triedLogin)
+        {
+            string regPage = webClient.DownloadString(PIN_URL);
+
+            if (regPage.Contains(REG_PAGE_SAMPLE))
+            {
+                string regPostData = "term_in=" + _currentTerm.GetTermCode();
+                foreach(string number in CRNs)
+                {
+                    regPostData += "&RSTS_IN=RW&CRN_IN=" + number;
+                    regPostData += "&assoc_term_in=&start_date_in=&end_date_in=";
+                }
+                regPostData += "&regs_row=0&wait_row=0&add_row=10&REG_BTN=Submit Changes";
+                regPostData = HttpUtility.UrlEncode(regPostData);
+                webClient.UploadString(PIN_URL, regPostData);
+            }
+            else if(regPage.Contains(LOGIN_SAMPLE))
+            {
+                // Tries going through login and stuff again.
+                if(AccessRegistrationPage() && triedLogin == false)
+                {
+                    LogToOutput("Failed to reach registration page. Trying login and creds.");
+                    return AddClasses(true);
+                } else
+                {
+                    LogToOutput("Failed to reach registration page again. Quitting.");
+                }
+            }
 
             return false;
         }

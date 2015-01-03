@@ -24,10 +24,15 @@ namespace FckKetReg.Models
 
         public Term(string seasonSpaceYearString)
         {
-            string[] parts = seasonSpaceYearString.Split(' ');
-            _season = GetSeasonCodeByName(parts[0]);
-            _year = Convert.ToInt32(parts[1]);
-            _termCode = _year.ToString() + _season;
+            try {
+                string[] parts = seasonSpaceYearString.Split(' ');
+                _season = GetSeasonCodeByName(parts[0]);
+                _year = Convert.ToInt32(parts[1]);
+                _termCode = _year.ToString() + _season;
+            } catch(IndexOutOfRangeException e)
+            {
+                throw new ArgumentException("Term must be in format: \"Summer 2015\"");
+            }
         }
 
         public string GetTermCode()
