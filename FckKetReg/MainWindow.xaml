@@ -17,7 +17,7 @@
 
         <GroupBox x:Name="crnGroupBox" Header="CRNs" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top" Height="119" Width="529">
             <Grid Margin="0,0,-2,-12" Height="109" VerticalAlignment="Top">
-                <TextBox x:Name="crn1" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" TextChanged="crn1_TextChanged"/>
+                <TextBox x:Name="crn1" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" />
                 <TextBox x:Name="crn2" HorizontalAlignment="Left" Height="23" Margin="135,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
                 <TextBox x:Name="crn3" HorizontalAlignment="Left" Height="23" Margin="260,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
                 <TextBox x:Name="crn4" HorizontalAlignment="Left" Height="23" Margin="385,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="119" RenderTransformOrigin="0.5,0.5"/>
