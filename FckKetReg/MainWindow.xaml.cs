@@ -42,15 +42,43 @@ namespace FckKetReg
             try
             {
                 InputtedCreds creds = GetInputtedCreds();
-                rm = new RequestManager(creds.username, creds.password, creds.regPin, creds.term);
+                rm = new RequestManager();
+                rm.SetCreds(creds.username, creds.password, creds.regPin, creds.term, creds.CRNs);
             }
             catch(ArgumentException) { LogToOutput("[-] Error: Invalid input."); return; }
-
 
             if (rm.AttemptLogin())
             {
                 rm.AccessRegistrationPage();
             }
+
+            _browserWindow.SetPage(rm.CurrentHTML);
+            LogToOutput(rm.Output);
+        }
+
+        private void FireRegistration(object sender, RoutedEventArgs e)
+        {
+            RequestManager rm;
+            try
+            {
+                InputtedCreds creds = GetInputtedCreds();
+                rm = new RequestManager();
+                rm.SetCreds(creds.username, creds.password, creds.regPin, creds.term, creds.CRNs);
+            }
+            catch (ArgumentException) { LogToOutput("[-] Error: Invalid input."); return; }
+
+            bool accessRegistrationSuccess = false;
+
+            if (rm.AttemptLogin())
+            {
+                accessRegistrationSuccess = rm.AccessRegistrationPage();
+            }
+
+            if(accessRegistrationSuccess)
+            {
+                rm.AddClasses();
+            }
+
             _browserWindow.SetPage(rm.CurrentHTML);
             LogToOutput(rm.Output);
         }
@@ -58,10 +86,12 @@ namespace FckKetReg
         private void ScheduleRegistration(object sender, RoutedEventArgs e)
         {
             LogToOutput("[-] Scheduling registration.");
+            InputtedCreds creds = GetInputtedCreds();
+
             try
             {
-                InputtedCreds creds = GetInputtedCreds();
-                _requestManager = new RequestManager(creds.username, creds.password, creds.regPin, creds.term);
+                _requestManager = new RequestManager();
+                _requestManager.SetCreds(creds.username, creds.password, creds.regPin, creds.term, creds.CRNs);
             } catch (ArgumentException exception)
             {
                 LogToOutput("[-] Error: Invalid argument passed. (" + exception.Message + ")");
@@ -70,41 +100,9 @@ namespace FckKetReg
             
             DateTime inputTime = Convert.ToDateTime(scheduledTime.Text);
 
-            // TODO: Use reflection here to loop through CRNs text boxes.
-            _requestManager.CRNs.Enqueue(crn1.Text);
-            _requestManager.CRNs.Enqueue(crn2.Text);
-            _requestManager.CRNs.Enqueue(crn3.Text);
-            _requestManager.CRNs.Enqueue(crn4.Text);
-            _requestManager.CRNs.Enqueue(crn5.Text);
-            _requestManager.CRNs.Enqueue(crn6.Text);
-            _requestManager.CRNs.Enqueue(crn7.Text);
-            _requestManager.CRNs.Enqueue(crn8.Text);
-            _requestManager.CRNs.Enqueue(crn9.Text);
-            _requestManager.CRNs.Enqueue(crn10.Text);
-
-            _registrationScheduler = new RegistrationScheduler(RegistrationCallback, LoginCallback);
+            _registrationScheduler = new RegistrationScheduler(creds.username, creds.password, creds.regPin, creds.term, creds.CRNs);
+            _registrationScheduler.PreviewWindow = _browserWindow;
             _registrationScheduler.ScheduleRegistration(inputTime);
-        }
-
-        public void RegistrationCallback(Object stateInfo)
-        {
-            _requestManager.AddClasses();
-            LogToOutput(_requestManager.Output, true);
-            _browserWindow.SetPage(_requestManager.CurrentHTML);
-        }
-
-        public void LoginCallback(Object stateInfo)
-        {
-            if(_requestManager.AttemptLogin())
-            {
-                if(_requestManager.AccessRegistrationPage() == false)
-                {
-                    _registrationScheduler.ClearTimers();
-                }
-            }
-
-            LogToOutput(_requestManager.Output, true);
-            _browserWindow.SetPage(_requestManager.CurrentHTML);
         }
 
         private InputtedCreds GetInputtedCreds()
@@ -113,7 +111,20 @@ namespace FckKetReg
             ofTheJedi.username = userID.Text;
             ofTheJedi.password = password.Password;
             ofTheJedi.regPin = regPin.Text;
-            ofTheJedi.term = new Term(term.Text);
+            ofTheJedi.term = term.Text;
+
+            ofTheJedi.CRNs = new Queue<string>();
+            ofTheJedi.CRNs.Enqueue(crn1.Text);
+            ofTheJedi.CRNs.Enqueue(crn2.Text);
+            ofTheJedi.CRNs.Enqueue(crn3.Text);
+            ofTheJedi.CRNs.Enqueue(crn4.Text);
+            ofTheJedi.CRNs.Enqueue(crn5.Text);
+            ofTheJedi.CRNs.Enqueue(crn6.Text);
+            ofTheJedi.CRNs.Enqueue(crn7.Text);
+            ofTheJedi.CRNs.Enqueue(crn8.Text);
+            ofTheJedi.CRNs.Enqueue(crn9.Text);
+            ofTheJedi.CRNs.Enqueue(crn10.Text);
+
             return ofTheJedi; // Lol.
         }
        
@@ -134,7 +145,8 @@ namespace FckKetReg
             public string username;
             public string password;
             public string regPin;
-            public Term term;
+            public string term;
+            public Queue<string> CRNs;
         }
     }
 }

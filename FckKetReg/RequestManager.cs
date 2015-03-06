@@ -1,20 +1,23 @@
 ﻿using FckKetReg.Models;
+using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading;
 using System.Web;
+using System.Windows.Forms;
 
 namespace FckKetReg
 {
     /// <summary>
     /// Handles requests at a high level to JWEB.
     /// </summary>
-    class RequestManager
+    public class RequestManager : IJob
     {
         private string userID = "";
         private string password = "";
-
         private string _registrationPIN;
+        private string _currentTermText;
         private Term _currentTerm;
 
         public Queue<string> CRNs { get; set; } // Class registration numbers.
@@ -24,8 +27,11 @@ namespace FckKetReg
         private const string BASE_URL = "https://jweb.kettering.edu/cku1/";
         private const string LOGIN_URL = BASE_URL + "twbkwbis.P_WWWLogin";
         private const string VAL_URL = BASE_URL + "twbkwbis.P_ValLogin";
+        // Will show 
         private const string PIN_URL = BASE_URL + "bwskfreg.P_AltPin";
         private const string CHECK_PIN_URL = BASE_URL + "bwskfreg.P_CheckAltPin";
+        // Class submission.
+        private const string REGS_URL = BASE_URL + "bwckcoms.P_Regs";
 
         public string Output { get; private set; }
         public string CurrentHTML { get; private set; }
@@ -36,15 +42,61 @@ namespace FckKetReg
                                    "Invalid Alternate PIN."
                                };
 
-        public RequestManager(string userID, string password, string registrationPIN, Term registeringForTerm)
+        public RequestManager()
         {
             LogToOutput("Preparing request system.");
             webClient = new CookiedWebClient();
+        }
+
+        public void Execute(IJobExecutionContext context)
+        {
+            JobKey key = context.JobDetail.Key;
+            JobDataMap dataMap = context.JobDetail.JobDataMap;
+            
+            this.userID = dataMap.GetString("userID");
+            this.password = dataMap.GetString("password");
+            this._registrationPIN = dataMap.GetString("registrationPIN");
+            this._currentTermText = dataMap.GetString("currentTerm");
+            this._currentTerm = new Term(_currentTermText);
+            this.CRNs = (Queue<string>)context.Scheduler.Context.Get("CRNs");
+
+            if(!AttemptLogin())
+            {
+                MessageBox.Show("Could not login to JWEB with provided creds.");
+                return;
+            }
+
+            int poisonPill = 0;
+
+            while(!AccessRegistrationPage())
+            {
+                // Will try to access registration page 30 times before failing.
+                if(poisonPill < 60)
+                {
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    MessageBox.Show("Could not access registration page in scheduling.");
+                    return;
+                }
+
+                poisonPill++;
+            }
+
+            // Do the dirty work.
+            AddClasses();
+            MessageBox.Show("Registration completed.");
+        }
+
+        public void SetCreds(string userID, string password, string registrationPIN, string registeringForTerm, Queue<string> CRNs)
+        {
             this.userID = userID;
             this.password = password;
-            _registrationPIN = registrationPIN;
-            _currentTerm = registeringForTerm;
-            CRNs = new Queue<string>();
+            this._registrationPIN = registrationPIN;
+            this._currentTermText = registeringForTerm;
+            this._currentTerm = new Term(_currentTermText);
+            this.CRNs = CRNs;
         }
 
         /// <summary>
@@ -96,8 +148,12 @@ namespace FckKetReg
             string pinPage;
             string altPinPageGet = webClient.DownloadString(PIN_URL);
 
+            // TODO: Break this up into separate functions, maybe even another class.
+
             if (altPinPageGet.Contains(TERM_PAGE_SAMPLE))
             {
+                // Term page.
+                // Give term, hope we get to PIN entry.
                 LogToOutput("Selecting a term.");
                 NameValueCollection termPost = new NameValueCollection { { "term_in", _currentTerm.GetTermCode() } };
                 byte[] termResponse = webClient.UploadValues(PIN_URL, termPost);
@@ -123,6 +179,7 @@ namespace FckKetReg
             }
             else if(altPinPageGet.Contains(REG_PAGE_SAMPLE))
             {
+                // Got to registration page! Congrats! :D
                 return true;
             }
             else
@@ -138,6 +195,12 @@ namespace FckKetReg
             {
                 LogToOutput("Page returned error: " + termError);
                 return false;
+            }
+
+            if(pinPage.Contains(REG_PAGE_SAMPLE))
+            {
+                LogToOutput("Reached Add/Drop classes page.");
+                return true;
             }
 
             if (!pinPage.Contains(PIN_PAGE_SAMPLE))
@@ -190,14 +253,21 @@ namespace FckKetReg
             if (regPage.Contains(REG_PAGE_SAMPLE))
             {
                 string regPostData = "term_in=" + _currentTerm.GetTermCode();
-                foreach(string number in CRNs)
+                regPostData += "&RSTS_IN=DUMMY&assoc_term_in=DUMMY&CRN_IN=DUMMY&start_date_in=DUMMY&end_date_in=DUMMY&SUBJ=DUMMY&CRSE=DUMMY&SEC=DUMMY&LEVL=DUMMY&CRED=DUMMY&GMOD=DUMMY&TITLE=DUMMY&MESG=DUMMY&REG_BTN=DUMMY";
+
+                foreach(string iterationNumber in CRNs)
                 {
+                    string number = iterationNumber;
+
                     regPostData += "&RSTS_IN=RW&CRN_IN=" + number;
                     regPostData += "&assoc_term_in=&start_date_in=&end_date_in=";
                 }
-                regPostData += "&regs_row=0&wait_row=0&add_row=10&REG_BTN=Submit Changes";
-                regPostData = HttpUtility.UrlEncode(regPostData);
-                webClient.UploadString(PIN_URL, regPostData);
+
+                regPostData += "&regs_row=0&wait_row=0&add_row=10&REG_BTN=Submit+Changes&REG_BTN=Submit+Changes";
+                string registerResponse = webClient.UploadString(REGS_URL, regPostData);
+                CurrentHTML = registerResponse;
+
+                return true;
             }
             else if(regPage.Contains(LOGIN_SAMPLE))
             {
@@ -230,7 +300,7 @@ namespace FckKetReg
 
         private string LogToOutput(string toAdd)
         {
-            Output += "[+]" + DateTime.Now + ": " + toAdd + "\n";
+            Output += "[+] " + DateTime.Now + ": " + toAdd + "\n";
             return toAdd;
         }
 

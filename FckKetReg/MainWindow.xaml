@@ -5,7 +5,7 @@
         Title="FckKetReg - Registration Scheduler" Height="522" Width="557">
     <Grid Margin="0,0,0,1">
         <Label x:Name="userIDLabel" Content="JWEB User ID" HorizontalAlignment="Left" Height="23" Margin="10,13,0,0" VerticalAlignment="Top" Width="89"/>
-        <TextBox x:Name="userID" HorizontalAlignment="Left" Height="23" Margin="104,13,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="userID" HorizontalAlignment="Left" Height="23" Margin="104,13,0,0" TextWrapping="Wrap" Text="kill4992" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="passwordLabel" Content="Password" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Height="23" Width="89"/>
         <PasswordBox x:Name="password" HorizontalAlignment="Left" Height="23" Margin="104,41,0,0" VerticalAlignment="Top" Width="120"/>
 
@@ -17,7 +17,7 @@
 
         <GroupBox x:Name="crnGroupBox" Header="CRNs" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top" Height="119" Width="529">
             <Grid Margin="0,0,-2,-12" Height="109" VerticalAlignment="Top">
-                <TextBox x:Name="crn1" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
+                <TextBox x:Name="crn1" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="32171" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
                 <TextBox x:Name="crn2" HorizontalAlignment="Left" Height="23" Margin="135,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
                 <TextBox x:Name="crn3" HorizontalAlignment="Left" Height="23" Margin="260,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
                 <TextBox x:Name="crn4" HorizontalAlignment="Left" Height="23" Margin="385,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="119" RenderTransformOrigin="0.5,0.5"/>
@@ -27,6 +27,8 @@
                 <TextBox x:Name="crn8" HorizontalAlignment="Left" Height="23" Margin="135,66,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
                 <TextBox x:Name="crn9" HorizontalAlignment="Left" Height="23" Margin="10,66,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
                 <TextBox x:Name="crn10" HorizontalAlignment="Left" Height="23" Margin="385,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+                
+                <Button Content="Fire Registration" HorizontalAlignment="Left" Margin="260,66,0,0" VerticalAlignment="Top" Width="107" Click="FireRegistration" Height="23"/>
             </Grid>
         </GroupBox>
 
@@ -42,11 +44,11 @@
         <ScrollViewer Margin="0,303,0,0" Background="Black" Foreground="White">
             <TextBlock x:Name="output" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="515" />
         </ScrollViewer>
-        <TextBox x:Name="regPin" HorizontalAlignment="Left" Height="23" Margin="323,13,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="regPin" HorizontalAlignment="Left" Height="23" Margin="323,13,0,0" TextWrapping="Wrap" Text="123456" VerticalAlignment="Top" Width="120"/>
         <ComboBox x:Name="term" HorizontalAlignment="Left" Margin="323,41,0,0" VerticalAlignment="Top" Width="120">
             <ComboBoxItem x:Name="term_201501" Content="Winter 2015"  />
             <ComboBoxItem x:Name="term_201502" Content="Spring 2015" />
-            <ComboBoxItem x:Name="term_201503" Content="Summer 2015" />
+            <ComboBoxItem x:Name="term_201503" Content="Summer 2015" IsSelected="True" />
             <ComboBoxItem x:Name="term_201504" Content="Fall 2015" />
         </ComboBox>
     </Grid>
