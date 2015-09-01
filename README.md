@@ -7,6 +7,10 @@
 
 **WARNING: Your computer must be left on and FckKetReg must be left running for the job to fire at the correct time.**
 
+## Download ##
+
+Installer can be downloaded from [SourceForge](http://sourceforge.net/projects/fckketreg/files/latest/download).
+
 ## Instructions for Scheduling Registration ##
 
 - Open FckKetReg.
